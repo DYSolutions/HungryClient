@@ -1,10 +1,14 @@
+'use client'
 import { CiHeart } from "react-icons/ci";
 import { FaCartShopping } from "react-icons/fa6";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const ProductCart = () => {
+
+    const router =useRouter();
     return (
-        <div className="flex flex-col items-center justify-end w-[200px] h-[290px] p-4 relative transform transition duration-300 ease-in-out hover:scale-105">
+        <div className="flex flex-col items-center justify-end w-[200px] cursor-pointer h-[290px] p-4 relative transform transition duration-300 ease-in-out hover:scale-105">
             <div className="absolute w-[120px] h-[120px] border-4 border-green-400 rounded-full top-0">
                 <Image src="/demo.jpg" alt="Product Image" width={120} height={120} className="rounded-full" />
             </div>
@@ -26,7 +30,9 @@ const ProductCart = () => {
 
                     <div className="w-[80%] flex flex-row justify-between items-center mb-4">
                         <span className="px-2 py-1 rounded-full border-2 border-gray-300 text-[15px] font-semibold">$ 20</span>
-                        <button className="bg-green-400 cursor-pointer text-white px-2 py-1 rounded-full hover:bg-green-500 transition duration-300 font-semibold text-[15px]">
+                        <button 
+                        onClick={()=>router.push(`/menu/${"jnejfnejfnjenf"}`)}
+                        className="bg-green-400 cursor-pointer text-white px-2 py-1 rounded-full hover:bg-green-500 transition duration-300 font-semibold text-[15px]">
                             Buy Now
                         </button>
                     </div>
