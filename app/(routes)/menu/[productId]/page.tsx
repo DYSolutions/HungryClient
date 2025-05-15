@@ -1,4 +1,4 @@
-
+'use client'
 import { HomeIcon } from "lucide-react";
 import Link from "next/link"
 import ImageSlider from "@/components/imageSlider";
@@ -6,10 +6,22 @@ import { FaCartShopping } from "react-icons/fa6";
 import ProductCart from "@/components/productCart";
 import { FaDollarSign } from "react-icons/fa";
 import AdProductCart from "@/components/adProductCart";
+import ServesSelector from "@/components/servesSelector";
+import { useEffect, useState } from "react";
 
 
-const ProductPage = async ({ params }: { params: { productId: string } }) => {
-    const { productId } = await params;
+const ProductPage = ({ params }: { params: { productId: string } }) => {
+    let product_Id;
+
+const [serves, setServes] = useState<number>(1)
+
+    useEffect(() => {
+        async function getProductId() {
+            const { productId } = await params;
+            product_Id = productId
+        }
+        getProductId();
+    }, []);
 
     return (
         <div className="flex flex-col w-full h-auto">
@@ -19,7 +31,7 @@ const ProductPage = async ({ params }: { params: { productId: string } }) => {
                 <span>{">"}</span>
                 <Link href="/menu" className="hover:text-green-400">Products</Link>
                 <span>{">"}</span>
-                <span className="text-gray-500">{productId}</span>
+                <span className="text-gray-500">{product_Id}</span>
             </div>
 
             <div className="flex flex-row items-center justify-start w-full h-[600px] gap-2 p-4 text-gray-600">
@@ -38,18 +50,7 @@ const ProductPage = async ({ params }: { params: { productId: string } }) => {
 
                         <h4 className="text-black text-[16px]">Serves</h4>
                         <div className="flex flex-col items-start gap-2">
-                            <div className="flex flex-row items-center gap-2">
-                                {[1, 2, 3, 4, 5, 6].map((num) => (
-                                    <div key={num} className="h-8 w-8 rounded-full border-2 flex flex-row items-center justify-center border-green-500 font-semibold text-black">
-                                        {num}
-                                    </div>
-                                ))}
-
-                                <label className="text-white ml-10 bg-green-500 rounded-lg flex flex-row items-center justify-center font-semibold h-8 w-8">1</label>
-                                <button className="h-8 w-8 rounded-full border-2 border-green-500 flex flex-row items-center justify-center bg-white font-bold text-black cursor-pointer">
-                                    +
-                                </button>
-                            </div>
+                            <ServesSelector serves={serves} setServes={setServes} />
                         </div>
                     </div>
 
@@ -59,7 +60,7 @@ const ProductPage = async ({ params }: { params: { productId: string } }) => {
                 <div className="w-[30%] h-[600px] p-5 flex flex-col gap-2 rounded-lg bg-[#f8faf8d0]">
                     <div className="grid grid-cols-2 gap-2">
                         <h4 className="font-bold text-black text-[16px]">Serves</h4>
-                        <span className="text-black text-[18px] font-bold">3</span>
+                        <span className="text-black text-[18px] font-bold">{serves}</span>
 
                         <h4 className="font-bold text-black text-[16px]">Per Item</h4>
                         <span className="text-black text-[18px] font-bold">$16.56</span>
