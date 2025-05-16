@@ -16,7 +16,7 @@ const Navbar = async () => {
 
     return (
         <div className=" h-16 flex items-center flex-row justify-between px-4">
-            <div className="font-bold text-green-400">HUNGRY</div>
+            <Link className="font-bold text-green-400 cursor-pointer" href={"/"}>HUNGRY</Link>
 
             <div className="flex flex-row items-center space-x-4 lg:space-x-6 pl-6">
                 {/* routes */}
