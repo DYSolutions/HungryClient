@@ -4,7 +4,9 @@ import MenuSidebar from "./components/sidebar";
 import Link from "next/link";
 import ProductCart from "@/components/productCart";
 import { RxCross2 } from "react-icons/rx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Product } from "@/types";
+import axios from "axios";
 
 const MenuPage = () => {
 
@@ -13,6 +15,21 @@ const MenuPage = () => {
     const [selectedCuisine, setSelectedCuisine] = useState<string>();
     const [selectedCategory, setSelectedCategory] = useState<string>();
     const [searchValue, setSearchValue] = useState<string>();
+
+    const [products, setProducts] = useState<Product[]>([]);
+
+    async function fetchProducts() {
+        try {
+            const res = await axios.get("/api/products")
+            setProducts(res.data)
+        } catch (error) {
+            console.log("ERROR CONNECTING API", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchProducts()
+    }, [])
 
     return (
         <div className="flex flex-row w-full h-auto">
@@ -89,10 +106,8 @@ const MenuPage = () => {
                 </div>
 
                 <div className="w-full p-4 grid grid-cols-5 gap-4">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((item) => (
-                        <div key={item} >
-                            <ProductCart />
-                        </div>
+                    {products.map((product) => (
+                        <ProductCart key={product?.id} product={product} />
                     ))}
                 </div>
 

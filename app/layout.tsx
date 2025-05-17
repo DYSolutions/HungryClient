@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/nav-bar";
 import Footer from "@/components/footer";
+import { ToastProvider } from "@/providers/toast-provider";
 
 const urbanist = Urbanist({
   variable: "--font-urbanist",
@@ -29,7 +30,7 @@ export default function RootLayout({
           {/* <ModelProvider />
           <ToastProvider />
           <LoaderProvider /> */}
-
+          <ToastProvider />
           <Navbar />
           {children}
           <Footer />

@@ -1,13 +1,35 @@
+'use client'
 import ProductCart from "@/components/productCart";
 import Image from "next/image";
 import { IoFastFood } from "react-icons/io5";
 import { MdHighQuality } from "react-icons/md";
 import { TbTruckDelivery } from "react-icons/tb";
+import axios from "axios";
+import { Product } from "@/types";
+import { useEffect, useState } from "react";
 
 const HomePage = () => {
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+
+  async function fetchProducts() {
+    try {
+      const res = await axios.get("/api/products")
+      setProducts(res.data)
+      const filteredProducts = res.data.filter((product: Product) => product.isFeatured===true);
+      setFeaturedProducts(filteredProducts);
+    } catch (error) {
+      console.log("ERROR CONNECTING API", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
   return (
     <div>
-
       {/* hero */}
       <div className="w-full h-auto flex flex-row justify-between">
         <div className="text-center w-full flex flex-col justify-center items-center bg-green-400 rounded-2xl shadow-lg p-10">
@@ -15,7 +37,7 @@ const HomePage = () => {
             JUST COME TO HUNGRY <br />& ORDER
           </h1>
           <button className="bg-white text-green-400 font-bold py-2 px-4 rounded-full hover:bg-green-500 hover:text-white transition duration-300 cursor-pointer">
-            Order Now
+           Order Now
           </button>
           <p className="text-white text-center mt-4">
             Experience the best food delivery service in town.
@@ -28,15 +50,9 @@ const HomePage = () => {
 
       {/* products */}
       <div className="grid grid-cols-6 p-4 mt-10 gap-4">
-        <ProductCart />
-        <ProductCart />
-        <ProductCart />
-        <ProductCart />
-        <ProductCart />
-        <ProductCart />
-        <ProductCart />
-        <ProductCart />
-        <ProductCart />
+        {featuredProducts.map((product) => (
+          <ProductCart key={product.id} product={product} />
+        ))}
       </div>
 
       {/* why choose us */}
