@@ -1,3 +1,7 @@
+'use client'
+import { Catagory, Size, Kitchen, Cuisine } from "@/types";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 interface MenuSidebarProps {
     setSelectedCategory: (category: string) => void;
@@ -9,6 +13,58 @@ interface MenuSidebarProps {
 }
 
 const MenuSidebar = ({ setSelectedCategory, setSearchValue, setSelectedCuisine, setSelectedKitchen, setSelectedSize, searchValue }: MenuSidebarProps) => {
+
+    const [catagories, setCatagories] = useState<Catagory[]>([])
+    const [sizes, setSizes] = useState<Size[]>([])
+    const [kitchens, setKitchens] = useState<Kitchen[]>([])
+    const [cuisines, setCuisines] = useState<Cuisine[]>([])
+
+    async function fetchCatagories() {
+        try {
+            const res = await axios.get("/api/catagories")
+            setCatagories(res.data)
+        } catch (error) {
+            console.log("ERROR CONNECTING API", error);
+
+        }
+    }
+
+    async function fetchSizes() {
+        try {
+            const res = await axios.get("/api/sizes")
+            setSizes(res.data)
+        } catch (error) {
+            console.log("ERROR CONNECTING API", error);
+
+        }
+    }
+
+    async function fetchCuisines() {
+        try {
+            const res = await axios.get("/api/cuisines")
+            setCuisines(res.data)
+        } catch (error) {
+            console.log("ERROR CONNECTING API", error);
+
+        }
+    }
+
+    async function fetchKitchens() {
+        try {
+            const res = await axios.get("/api/kitchens")
+            setKitchens(res.data)
+        } catch (error) {
+            console.log("ERROR CONNECTING API", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchCatagories()
+        fetchSizes()
+        fetchCuisines()
+        fetchKitchens()
+    }, [])
+
     return (
         <div className="flex flex-col w-[180px] text-black shadow-lg">
 
@@ -24,72 +80,44 @@ const MenuSidebar = ({ setSelectedCategory, setSearchValue, setSelectedCuisine, 
             <div className=" w-full h-auto border-b-1 border-gray-100 ">
                 <ul className="space-y-2 p-4 text-[13px]">
                     <h3 className="font-bold text-[15px]">Category</h3>
-                    <li onClick={() => setSelectedCategory("Pizza")} className="cursor-pointer hover:text-green-400">
-                        Pizza
-                    </li>
-                    <li onClick={() => setSelectedCategory("Biriyani")} className="cursor-pointer hover:text-green-400">
-                        Biriyani
-                    </li>
-                    <li onClick={() => setSelectedCategory("Fruits")} className="cursor-pointer hover:text-green-400">
-                        Fruits
-                    </li>
-                    <li onClick={() => setSelectedCategory("Drinks")} className="cursor-pointer hover:text-green-400">
-                        Drinks
-                    </li>
+                    {catagories.map((catagory) => (
+                        <li onClick={() => setSelectedCategory(catagory?.label)} key={catagory?.id} className="cursor-pointer hover:text-green-400">
+                            {catagory?.label}
+                        </li>
+                    ))}
                 </ul>
             </div>
 
             <div className="  w-full h-auto border-b-1 border-gray-100 ">
                 <ul className="space-y-2 p-4 text-[13px] mt-4">
                     <h3 className="font-bold text-[15px]">Size</h3>
-                    <li onClick={() => setSelectedSize("Small")} className="cursor-pointer hover:text-green-400">
-                        Small
-                    </li>
-                    <li onClick={() => setSelectedSize("Medium")} className="cursor-pointer hover:text-green-400">
-                        Medium
-                    </li>
-                    <li onClick={() => setSelectedSize("Large")} className="cursor-pointer hover:text-green-400">
-                        Large
-                    </li>
-                    <li onClick={() => setSelectedSize("Extra Large")} className="cursor-pointer hover:text-green-400">
-                        Extra Large
-                    </li>
+                    {sizes.map((size) => (
+                        <li onClick={() => setSelectedSize(size?.value)} key={size?.id} className="cursor-pointer hover:text-green-400">
+                            {size?.name}
+                        </li>
+                    ))}
                 </ul>
             </div>
 
             <div className=" w-full h-auto border-b-1 border-gray-100">
                 <ul className="space-y-2 p-4 text-[13px] mt-4">
                     <h3 className="font-bold text-[15px]">Kitchen</h3>
-                    <li onClick={() => setSelectedKitchen("Italian")} className="cursor-pointer hover:text-green-400">
-                        Italian
-                    </li>
-                    <li onClick={() => setSelectedKitchen("Indian")} className="cursor-pointer hover:text-green-400">
-                        Indian
-                    </li>
-                    <li onClick={() => setSelectedKitchen("Chinese")} className="cursor-pointer hover:text-green-400">
-                        Chinese
-                    </li>
-                    <li onClick={() => setSelectedKitchen("Mexican")} className="cursor-pointer hover:text-green-400">
-                        Mexican
-                    </li>
+                    {kitchens.map((kitchen) => (
+                        <li onClick={() => setSelectedKitchen(kitchen?.value)} key={kitchen?.id} className="cursor-pointer hover:text-green-400">
+                            {kitchen?.value}
+                        </li>
+                    ))}
                 </ul>
             </div>
 
             <div className="  w-full h-auto border-b-1 border-gray-100">
                 <ul className="space-y-2 p-4 text-[13px] mt-4">
                     <h3 className="font-bold text-[15px]">Cuisine</h3>
-                    <li onClick={() => setSelectedCuisine("Italian")} className="cursor-pointer hover:text-green-400">
-                        Italian
-                    </li>
-                    <li onClick={() => setSelectedCuisine("Indian")} className="cursor-pointer hover:text-green-400">
-                        Indian
-                    </li>
-                    <li onClick={() => setSelectedCuisine("Chinese")} className="cursor-pointer hover:text-green-400">
-                        Chinese
-                    </li>
-                    <li onClick={() => setSelectedCuisine("Mexican")} className="cursor-pointer hover:text-green-400">
-                        Mexican
-                    </li>
+                    {cuisines.map((cuisine) => (
+                        <li onClick={() => setSelectedCuisine(cuisine?.value)} key={cuisine?.id} className="cursor-pointer hover:text-green-400">
+                            {cuisine?.value}
+                        </li>
+                    ))}
                 </ul>
             </div>
         </div>

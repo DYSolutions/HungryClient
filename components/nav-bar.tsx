@@ -3,10 +3,16 @@ import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import MainNav from "./main-nav";
 import { FaCartShopping } from "react-icons/fa6";
 import Link from "next/link";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useCart } from "@/providers/cartProvider";
 
 const Navbar = () => {
 
     const { user } = useUser()
+    const { cartCount, refreshCart } = useCart()
+
+
 
     return (
         <div className=" h-16 flex items-center flex-row justify-between px-4">
@@ -29,7 +35,7 @@ const Navbar = () => {
                         href={"/cart"}
                     >
                         <FaCartShopping className="h-3 w-3" />
-                        <span className="text-[10px]">0</span>
+                        <span className="text-[10px]">{cartCount || 0}</span>
                     </Link>
                 )}
             </div>
@@ -38,3 +44,4 @@ const Navbar = () => {
 }
 
 export default Navbar;
+

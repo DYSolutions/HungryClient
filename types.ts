@@ -62,6 +62,20 @@ export interface Product {
     kitchen: string,
     category: string,
     cuisine: string,
+    serves?: number,
+    createdAt: Timestamp | string,
+    updatedAt: Timestamp | string
+}
+
+export interface User {
+    id: string,
+    clerkUserId: string,
+    userName: string,
+    userEmail: string,
+    isAdmin: boolean,
+    isActive: boolean,
+    soldProducts: Product[],
+    cartProducts: Product[],
     createdAt: Timestamp | string,
     updatedAt: Timestamp | string
 }

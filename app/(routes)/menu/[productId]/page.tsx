@@ -13,10 +13,12 @@ import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { Product } from "@/types";
 import axios from "axios";
+import { useCart } from "@/providers/cartProvider";
 
 
 const ProductPage = () => {
 
+    const { refreshCart } = useCart()
     const [serves, setServes] = useState<number>(1)
     const router = useRouter();
     const params = useParams()
@@ -24,14 +26,64 @@ const ProductPage = () => {
     const [product, setProduct] = useState<Product>();
     const [products, setProducts] = useState<Product[]>([]);
 
-    const handleAddCart = () => {
+    const handleAddCart = async (product: Product) => {
         if (user?.id) {
-            // router.push(`/cart`)
-            toast.success("Product added to cart")
+            try {
+                let userExists = true;
+                try {
+                    await axios.get("/api/users");
+                } catch (err: any) {
+                    if (err.response?.status === 404) {
+                        userExists = false;
+                    }
+                }
+
+                if (!userExists) {
+                    await axios.post('/api/users', {
+                        clerkUserId: user.id,
+                        userName: user.fullName,
+                        userEmail: user.emailAddresses[0].emailAddress,
+                        isAdmin: false,
+                        isActive: true,
+                        soldProducts: [],
+                        cartProducts: [product],
+                        createdAt: new Date().toISOString(),
+                    });
+                    refreshCart()
+                    toast.success("Product added to cart");
+                }
+                else {
+                    const user = await axios.get("/api/users");
+                    const alreadyExists = user.data.cartProducts.find((item: Product) => item.id === product.id);
+                    if (alreadyExists) {
+                        const isChangeServrs = alreadyExists.serves !== serves
+                        if (isChangeServrs) {
+                            await axios.patch('/api/users', {
+                                cartProducts: user.data.cartProducts.map((item: Product) => item.id === product.id ? { ...item, serves } : item),
+                                updatedAt: new Date().toISOString(),
+                            });
+                            toast.success("Product updated in cart");
+                            return;
+                        }
+                        toast.error("Product already in cart");
+                        return;
+                    }
+                    await axios.patch('/api/users', {
+                        cartProducts: [...user.data.cartProducts, product],
+                        updatedAt: new Date().toISOString(),
+                    });
+                }
+                refreshCart()
+                toast.success("Product added to cart");
+            } catch (error) {
+                console.log("ERROR ADDING PRODUCT TO CART", error);
+                toast.error("Failed to add product");
+            }
         } else {
-            router.push(`/sign-in`)
+            router.push(`/sign-in`);
         }
-    }
+    };
+
 
     const handleBuyProduct = () => {
         if (user?.id) {
@@ -85,12 +137,14 @@ const ProductPage = () => {
 
                         <h4 className="text-black text-[16px]">Serves</h4>
                         <div className="flex flex-col items-start gap-2">
-                            <ServesSelector serves={serves} setServes={setServes} />
+                            {product && (
+                                <ServesSelector serves={serves} setServes={setServes} product={product as Product} onClick={() => { }} />
+                            )}
                         </div>
                     </div>
 
                     <button
-                        onClick={() => handleAddCart()}
+                        onClick={() => handleAddCart({ ...product, serves } as Product)}
                         className="bg-black text-white cursor-pointer h-10 px-2 w-[400px] whitespace-nowrap flex flex-row items-center justify-center gap-2 rounded-lg">
                         Add to Cart <FaCartShopping />
                     </button>
@@ -119,10 +173,8 @@ const ProductPage = () => {
                         Pay & Buy Now <FaDollarSign /> {"23.3"}</button>
 
                     <div className="flex flex-col items-center justify-center h-[70%] w-full gap-2">
-                        {[1, 2, 3].map((num) => (
-                            <div key={num} className="w-full">
-                                <AdProductCart />
-                            </div>
+                        {products.filter((item: Product) => item.isFeatured && item.category === product?.category).slice(0, 3).map((product: Product) => (
+                            <AdProductCart key={product.id} product={product} />
                         ))}
                     </div>
                 </div>
@@ -139,7 +191,6 @@ const ProductPage = () => {
                     ))}
                 </div>
             </div>
-
         </div>
     )
 }

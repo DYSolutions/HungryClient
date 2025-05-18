@@ -1,9 +1,13 @@
+import { Product } from "@/types"
+import { on } from "events"
 
 interface ServesSelectorProps {
     serves: number
     setServes: (serves: number) => void
+    product: Product
+    onClick: () => void
 }
-const ServesSelector = ({ serves, setServes }: ServesSelectorProps) => {
+const ServesSelector = ({ serves, setServes, product, onClick }: ServesSelectorProps) => {
 
 
     return (
@@ -11,7 +15,7 @@ const ServesSelector = ({ serves, setServes }: ServesSelectorProps) => {
             {[1, 2, 3, 4, 5, 6].map((num) => (
                 <div
                     key={num}
-                    onClick={() => setServes(num)}
+                    onClick={() => { setServes(num), product.serves = num, onClick() }}
                     className={`h-8 w-8 rounded-full cursor-pointer border-2 ${serves === num ? "bg-green-400 text-white" : "bg-white text-black"} flex flex-row items-center justify-center border-green-500 font-semibold`}>
                     {num}
                 </div>

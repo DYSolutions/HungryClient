@@ -1,11 +1,13 @@
 'use client'
-import { CiHeart } from "react-icons/ci";
 import { FaCartShopping } from "react-icons/fa6";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useUser } from "@clerk/nextjs";
 import { Product } from "@/types";
+import axios from "axios";
+import { useEffect } from "react";
+import { useCart } from "@/providers/cartProvider";
 
 interface ProductCartProps {
     product: Product
@@ -16,15 +18,61 @@ const ProductCart = ({ product }: ProductCartProps) => {
     const router = useRouter();
 
     const { user } = useUser()
+    const { cartCount, refreshCart } = useCart()
 
-    const handleAddCart = () => {
+    const handleAddCart = async (product: Product) => {
         if (user?.id) {
-            // router.push(`/cart`)
-            toast.success("Product added to cart")
+            try {
+                let userExists = true;
+                try {
+                    await axios.get("/api/users"); // will throw 404 if user doesn't exist
+                } catch (err: any) {
+                    if (err.response?.status === 404) {
+                        userExists = false;
+                    }
+                }
+
+                if (!userExists) {
+                    await axios.post('/api/users', {
+                        clerkUserId: user.id,
+                        userName: user.fullName,
+                        userEmail: user.emailAddresses[0].emailAddress,
+                        isAdmin: false,
+                        isActive: true,
+                        soldProducts: [],
+                        cartProducts: [product],
+                        createdAt: new Date().toISOString(),
+                    });
+                    refreshCart()
+                    toast.success("Product added to cart");
+                }
+                else {
+                    const user = await axios.get("/api/users");
+                    const alreadyExists = user.data.cartProducts.some((item: Product) => item.id === product.id);
+                    if (alreadyExists) {
+                        toast.error("Product already in cart");
+                        return;
+                    }
+                    await axios.patch('/api/users', {
+                        cartProducts: [...user.data.cartProducts, product],
+                        updatedAt: new Date().toISOString(),
+                    });
+                }
+                refreshCart()
+                toast.success("Product added to cart");
+            } catch (error) {
+                console.log("ERROR ADDING PRODUCT TO CART", error);
+                toast.error("Failed to add product");
+            }
         } else {
-            router.push(`/sign-in`)
+            router.push(`/sign-in`);
         }
-    }
+    };
+
+
+    useEffect(() => {
+        product?.serves === 1
+    }, [product?.serves])
 
     return (
         <div className="flex flex-col items-center justify-end w-[200px] cursor-pointer h-[290px] p-4 relative transform transition duration-300 ease-in-out hover:scale-105">
@@ -35,7 +83,7 @@ const ProductCart = ({ product }: ProductCartProps) => {
                 <div className="w-full flex flex-row justify-end items-center">
                     {/* <CiHeart className="p-1 h-7 w-7 " /> */}
                     <FaCartShopping
-                        onClick={() => handleAddCart()}
+                        onClick={() => handleAddCart({ ...product, serves: 1 } as Product)}
                         className="text-white cursor-pointer bg-black p-2 h-7 w-7 rounded-tr-lg rounded-bl-lg" />
                 </div>
                 <div className="w-full h-[150px] flex flex-col items-center justify-center gap-2 rounded-lg">

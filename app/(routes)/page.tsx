@@ -17,7 +17,7 @@ const HomePage = () => {
     try {
       const res = await axios.get("/api/products")
       setProducts(res.data)
-      const filteredProducts = res.data.filter((product: Product) => product.isFeatured===true);
+      const filteredProducts = res.data.filter((product: Product) => product.isFeatured === true);
       setFeaturedProducts(filteredProducts);
     } catch (error) {
       console.log("ERROR CONNECTING API", error);
@@ -37,7 +37,7 @@ const HomePage = () => {
             JUST COME TO HUNGRY <br />& ORDER
           </h1>
           <button className="bg-white text-green-400 font-bold py-2 px-4 rounded-full hover:bg-green-500 hover:text-white transition duration-300 cursor-pointer">
-           Order Now
+            Order Now
           </button>
           <p className="text-white text-center mt-4">
             Experience the best food delivery service in town.

@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/nav-bar";
 import Footer from "@/components/footer";
 import { ToastProvider } from "@/providers/toast-provider";
+import { CartProvider } from "@/providers/cartProvider";
 
 const urbanist = Urbanist({
   variable: "--font-urbanist",
@@ -23,19 +24,21 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`cn("bg-background antialiased", "${urbanist.variable}") px-10`}
-        >
-          {/* <ModelProvider />
+      <CartProvider>
+        <html lang="en">
+          <body
+            className={`cn("bg-background antialiased", "${urbanist.variable}") px-10`}
+          >
+            {/* <ModelProvider />
           <ToastProvider />
           <LoaderProvider /> */}
-          <ToastProvider />
-          <Navbar />
-          {children}
-          <Footer />
-        </body>
-      </html>
+            <ToastProvider />
+            <Navbar />
+            {children}
+            <Footer />
+          </body>
+        </html>
+      </CartProvider>
     </ClerkProvider>
   );
 }

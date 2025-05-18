@@ -17,6 +17,7 @@ const MenuPage = () => {
     const [searchValue, setSearchValue] = useState<string>();
 
     const [products, setProducts] = useState<Product[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
     async function fetchProducts() {
         try {
@@ -31,6 +32,30 @@ const MenuPage = () => {
         fetchProducts()
     }, [])
 
+    useEffect(() => {
+        let tempProducts = [...products];
+
+        if (selectedSize) {
+            tempProducts = tempProducts.filter((product) => product.size === selectedSize);
+        }
+        if (selectedKitchen) {
+            tempProducts = tempProducts.filter((product) => product.kitchen === selectedKitchen);
+        }
+        if (selectedCuisine) {
+            tempProducts = tempProducts.filter((product) => product.cuisine === selectedCuisine);
+        }
+        if (selectedCategory) {
+            tempProducts = tempProducts.filter((product) => product.category === selectedCategory);
+        }
+        if (searchValue) {
+            tempProducts = tempProducts.filter((product) =>
+                product.name?.toLowerCase().includes(searchValue.toLowerCase())
+            );
+        }
+        setFilteredProducts(tempProducts);
+    }, [selectedCategory, selectedCuisine, selectedKitchen, selectedSize, searchValue, products]);
+
+
     return (
         <div className="flex flex-row w-full h-auto">
             <MenuSidebar
@@ -41,7 +66,6 @@ const MenuPage = () => {
                 setSearchValue={setSearchValue}
                 searchValue={searchValue ?? ""}
             />
-
 
             <div className=" w-full">
                 <div className="flex flex-row items-center justify-start gap-2 p-4 text-gray-600">
@@ -106,11 +130,10 @@ const MenuPage = () => {
                 </div>
 
                 <div className="w-full p-4 grid grid-cols-5 gap-4">
-                    {products.map((product) => (
+                    {filteredProducts.map((product) => (
                         <ProductCart key={product?.id} product={product} />
                     ))}
                 </div>
-
             </div>
         </div>
     )
