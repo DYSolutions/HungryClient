@@ -7,24 +7,32 @@ import { RxCross2 } from "react-icons/rx";
 import { useEffect, useState } from "react";
 import { Product } from "@/types";
 import axios from "axios";
+import { useLoader } from "@/contacts/loaderContact";
+import Loader from "@/components/loader";
+import Processing from "@/components/processing";
 
 const MenuPage = () => {
 
+    const { isLoading, setIsLoading } = useLoader();
     const [selectedSize, setSelectedSize] = useState<string>();
     const [selectedKitchen, setSelectedKitchen] = useState<string>();
     const [selectedCuisine, setSelectedCuisine] = useState<string>();
     const [selectedCategory, setSelectedCategory] = useState<string>();
     const [searchValue, setSearchValue] = useState<string>();
+    const [adding, setAdding] = useState<boolean>(false);
 
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
     async function fetchProducts() {
         try {
+            setIsLoading(true)
             const res = await axios.get("/api/products")
             setProducts(res.data)
         } catch (error) {
             console.log("ERROR CONNECTING API", error);
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -55,9 +63,10 @@ const MenuPage = () => {
         setFilteredProducts(tempProducts);
     }, [selectedCategory, selectedCuisine, selectedKitchen, selectedSize, searchValue, products]);
 
+    if (isLoading) return <Loader />
 
     return (
-        <div className="flex flex-row w-full h-auto">
+        <div className="flex flex-row w-full min-h-[100vh]">
             <MenuSidebar
                 setSelectedSize={setSelectedSize}
                 setSelectedKitchen={setSelectedKitchen}
@@ -66,6 +75,8 @@ const MenuPage = () => {
                 setSearchValue={setSearchValue}
                 searchValue={searchValue ?? ""}
             />
+
+            {adding && <Processing />}
 
             <div className=" w-full">
                 <div className="flex flex-row items-center justify-start gap-2 p-4 text-gray-600">
@@ -131,7 +142,7 @@ const MenuPage = () => {
 
                 <div className="w-full p-4 grid grid-cols-5 gap-4">
                     {filteredProducts.map((product) => (
-                        <ProductCart key={product?.id} product={product} />
+                        <ProductCart key={product?.id} product={product} setAdding={setAdding} />
                     ))}
                 </div>
             </div>

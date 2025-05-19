@@ -77,7 +77,7 @@ const MenuSidebar = ({ setSelectedCategory, setSearchValue, setSelectedCuisine, 
                 </div>
             </div>
 
-            <div className=" w-full h-auto border-b-1 border-gray-100 ">
+            <div className=" w-full h-auto border-b-1 border-gray-100 min-h-[200px]">
                 <ul className="space-y-2 p-4 text-[13px]">
                     <h3 className="font-bold text-[15px]">Category</h3>
                     {catagories.map((catagory) => (
@@ -88,7 +88,7 @@ const MenuSidebar = ({ setSelectedCategory, setSearchValue, setSelectedCuisine, 
                 </ul>
             </div>
 
-            <div className="  w-full h-auto border-b-1 border-gray-100 ">
+            <div className="  w-full h-auto border-b-1 border-gray-100 min-h-[200px]">
                 <ul className="space-y-2 p-4 text-[13px] mt-4">
                     <h3 className="font-bold text-[15px]">Size</h3>
                     {sizes.map((size) => (
@@ -99,7 +99,7 @@ const MenuSidebar = ({ setSelectedCategory, setSearchValue, setSelectedCuisine, 
                 </ul>
             </div>
 
-            <div className=" w-full h-auto border-b-1 border-gray-100">
+            <div className=" w-full h-auto border-b-1 border-gray-100 min-h-[200px]">
                 <ul className="space-y-2 p-4 text-[13px] mt-4">
                     <h3 className="font-bold text-[15px]">Kitchen</h3>
                     {kitchens.map((kitchen) => (
@@ -110,7 +110,7 @@ const MenuSidebar = ({ setSelectedCategory, setSearchValue, setSelectedCuisine, 
                 </ul>
             </div>
 
-            <div className="  w-full h-auto border-b-1 border-gray-100">
+            <div className="  w-full h-auto border-b-1 border-gray-100 min-h-[200px]">
                 <ul className="space-y-2 p-4 text-[13px] mt-4">
                     <h3 className="font-bold text-[15px]">Cuisine</h3>
                     {cuisines.map((cuisine) => (

@@ -7,20 +7,28 @@ import { TbTruckDelivery } from "react-icons/tb";
 import axios from "axios";
 import { Product } from "@/types";
 import { useEffect, useState } from "react";
+import { useLoader } from "@/contacts/loaderContact"
+import Loader from "@/components/loader";
+import Processing from "@/components/processing";
 
 const HomePage = () => {
 
+  const { isLoading, setIsLoading } = useLoader();
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [adding, setAdding] = useState(false)
 
   async function fetchProducts() {
     try {
+      setIsLoading(true)
       const res = await axios.get("/api/products")
       setProducts(res.data)
       const filteredProducts = res.data.filter((product: Product) => product.isFeatured === true);
       setFeaturedProducts(filteredProducts);
     } catch (error) {
       console.log("ERROR CONNECTING API", error);
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -28,9 +36,13 @@ const HomePage = () => {
     fetchProducts()
   }, [])
 
+  if (isLoading) return <Loader />;
+
   return (
     <div>
       {/* hero */}
+
+      {adding && <Processing />}
       <div className="w-full h-auto flex flex-row justify-between">
         <div className="text-center w-full flex flex-col justify-center items-center bg-green-400 rounded-2xl shadow-lg p-10">
           <h1 className="text-4xl font-bold text-center text-white mb-4">
@@ -51,7 +63,7 @@ const HomePage = () => {
       {/* products */}
       <div className="grid grid-cols-6 p-4 mt-10 gap-4">
         {featuredProducts.map((product) => (
-          <ProductCart key={product.id} product={product} />
+          <ProductCart key={product.id} product={product} setAdding={setAdding} />
         ))}
       </div>
 

@@ -9,15 +9,21 @@ import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { FaDollarSign } from "react-icons/fa6"
 import { TiTick } from "react-icons/ti"
+import { useLoader } from "@/contacts/loaderContact"
+import Loader from "@/components/loader"
+import { set } from "react-hook-form"
+import Processing from "@/components/processing"
 
 const CartPage = () => {
 
+    const { isLoading, setIsLoading } = useLoader()
     const { user } = useUser()
     const { cartCount, refreshCart } = useCart()
     const router = useRouter()
     const [isView, setIsView] = useState<boolean>(false)
     const [cartProducts, setCartProducts] = useState<Product[]>([])
     const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
+    const [processing, setProcessing] = useState<boolean>(false)
 
     useEffect(() => {
         if (!user?.id) {
@@ -50,6 +56,7 @@ const CartPage = () => {
 
     const handleClearCart = async () => {
         try {
+            setProcessing(true)
             await axios.patch("/api/users", {
                 cartProducts: [],
                 updatedAt: new Date().toISOString(),
@@ -59,15 +66,20 @@ const CartPage = () => {
             toast.success("Cart cleared")
         } catch (error) {
             console.log("ERROR CONNECTING API", error);
+        } finally {
+            setProcessing(false)
         }
     }
 
     async function fetchCartItems() {
         try {
+            setIsLoading(true)
             const user = await axios.get("/api/users");
             setCartProducts(user.data.cartProducts);
         } catch (error) {
             console.log("ERROR CONNECTING API", error);
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -78,8 +90,11 @@ const CartPage = () => {
 
     const total = selectedProducts.reduce((acc, product) => acc + (Number(product.price) * (product?.serves ?? 1)), 0);
 
+    if (isLoading) return <Loader />
+
     return (
         <>
+            {processing && <Processing />}
             {isView && (
                 <div className="flex flex-col w-full h-auto p-4 min-h-[600px] mb-10">
                     <div className="w-full h-[50px] flex flex-row items-center justify-between">
@@ -102,7 +117,7 @@ const CartPage = () => {
                                         <TiTick className={`h-3 w-3 ${selectedProducts.find((item) => item.id === product.id) ? 'text-green-400' : 'text-gray-300'}`} />
                                     </div>
                                     <div className={`h-[120px] w-[95%] shadow-lg flex flex-row items-center justify-between rounded-lg border-2 ${selectedProducts.find((item) => item.id === product.id) ? 'border-green-400' : 'border-gray-100'}`}>
-                                        <CartItem key={product.id} product={product} cartProducts={cartProducts} onClick={() => handleChange(product)} />
+                                        <CartItem key={product.id} product={product} cartProducts={cartProducts} onClick={() => handleChange(product)} setProcessing={setProcessing} />
                                     </div>
                                 </div>
                             ))}

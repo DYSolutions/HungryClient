@@ -14,10 +14,14 @@ import toast from "react-hot-toast";
 import { Product } from "@/types";
 import axios from "axios";
 import { useCart } from "@/providers/cartProvider";
+import Loader from "@/components/loader";
+import { useLoader } from "@/contacts/loaderContact";
+import Processing from "@/components/processing";
 
 
 const ProductPage = () => {
 
+    const { isLoading, setIsLoading } = useLoader()
     const { refreshCart } = useCart()
     const [serves, setServes] = useState<number>(1)
     const router = useRouter();
@@ -25,10 +29,12 @@ const ProductPage = () => {
     const { user } = useUser()
     const [product, setProduct] = useState<Product>();
     const [products, setProducts] = useState<Product[]>([]);
+    const [adding, setAdding] = useState(false)
 
     const handleAddCart = async (product: Product) => {
         if (user?.id) {
             try {
+                setAdding(true)
                 let userExists = true;
                 try {
                     await axios.get("/api/users");
@@ -78,6 +84,8 @@ const ProductPage = () => {
             } catch (error) {
                 console.log("ERROR ADDING PRODUCT TO CART", error);
                 toast.error("Failed to add product");
+            } finally {
+                setAdding(false)
             }
         } else {
             router.push(`/sign-in`);
@@ -96,6 +104,7 @@ const ProductPage = () => {
 
     async function fetchProducts() {
         try {
+            setIsLoading(true)
             const { productId } = await params;
             const res = await axios.get("/api/products");
             setProducts(res.data);
@@ -104,14 +113,20 @@ const ProductPage = () => {
         } catch (error) {
             console.log("ERROR CONNECTING API", error);
         }
+        finally {
+            setIsLoading(false)
+        }
     }
 
     useEffect(() => {
         fetchProducts()
     }, [])
 
+    if (isLoading) return <Loader />
+
     return (
         <div className="flex flex-col w-full h-auto">
+            {adding && <Processing />}
             <div className="flex flex-row items-center justify-start gap-2 p-4 text-gray-600">
                 <HomeIcon className="h-5 w-5" />
                 <Link href="/" className="hover:text-green-400">Main menu </Link>
@@ -174,7 +189,7 @@ const ProductPage = () => {
 
                     <div className="flex flex-col items-center justify-center h-[70%] w-full gap-2">
                         {products.filter((item: Product) => item.isFeatured && item.category === product?.category).slice(0, 3).map((product: Product) => (
-                            <AdProductCart key={product.id} product={product} />
+                            <AdProductCart key={product.id} product={product} setAdding={setAdding} />
                         ))}
                     </div>
                 </div>
@@ -186,8 +201,7 @@ const ProductPage = () => {
                 <h4 className="font-bold text-black text-[20px]">Releted Products</h4>
                 <div className="w-full p-4 grid grid-cols-6 gap-4">
                     {products.filter((item: Product) => item.category === product?.category).map((product: Product) => (
-                        <ProductCart key={product.id} product={product}
-                        />
+                        <ProductCart key={product.id} product={product} setAdding={setAdding} />
                     ))}
                 </div>
             </div>

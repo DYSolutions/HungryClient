@@ -6,14 +6,16 @@ import toast from "react-hot-toast";
 import { useUser } from "@clerk/nextjs";
 import { Product } from "@/types";
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/providers/cartProvider";
+import Processing from "./processing";
 
 interface ProductCartProps {
     product: Product
+    setAdding: (adding: boolean) => void
 }
 
-const ProductCart = ({ product }: ProductCartProps) => {
+const ProductCart = ({ product, setAdding }: ProductCartProps) => {
 
     const router = useRouter();
 
@@ -23,6 +25,7 @@ const ProductCart = ({ product }: ProductCartProps) => {
     const handleAddCart = async (product: Product) => {
         if (user?.id) {
             try {
+                setAdding(true)
                 let userExists = true;
                 try {
                     await axios.get("/api/users"); // will throw 404 if user doesn't exist
@@ -63,6 +66,8 @@ const ProductCart = ({ product }: ProductCartProps) => {
             } catch (error) {
                 console.log("ERROR ADDING PRODUCT TO CART", error);
                 toast.error("Failed to add product");
+            } finally {
+                setAdding(false)
             }
         } else {
             router.push(`/sign-in`);
@@ -107,7 +112,6 @@ const ProductCart = ({ product }: ProductCartProps) => {
                     </div>
                 </div>
             </div>
-
         </div>
     );
 }

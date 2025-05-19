@@ -13,9 +13,10 @@ import { IoMdStar, IoMdStarHalf, IoMdStarOutline } from "react-icons/io"
 
 interface AdProductCartProps {
     product: Product
+    setAdding: (adding: boolean) => void
 }
 
-const AdProductCart = ({ product }: AdProductCartProps) => {
+const AdProductCart = ({ product, setAdding }: AdProductCartProps) => {
 
     const router = useRouter()
     const { user } = useUser()
@@ -24,6 +25,7 @@ const AdProductCart = ({ product }: AdProductCartProps) => {
     const handleAddCart = async (product: Product) => {
         if (user?.id) {
             try {
+                setAdding(true)
                 let userExists = true;
                 try {
                     await axios.get("/api/users"); // will throw 404 if user doesn't exist
@@ -64,6 +66,8 @@ const AdProductCart = ({ product }: AdProductCartProps) => {
             } catch (error) {
                 console.log("ERROR ADDING PRODUCT TO CART", error);
                 toast.error("Failed to add product");
+            } finally {
+                setAdding(false)
             }
         } else {
             router.push(`/sign-in`);

@@ -13,8 +13,9 @@ interface CartItemProps {
     product: Product
     cartProducts: Product[]
     onClick: () => void
+    setProcessing: (processing: boolean) => void
 }
-const CartItem = ({ product, cartProducts, onClick }: CartItemProps) => {
+const CartItem = ({ product, cartProducts, onClick, setProcessing }: CartItemProps) => {
 
     const router = useRouter()
     const [serves, setServes] = useState<number>(product?.serves || 1)
@@ -22,6 +23,7 @@ const CartItem = ({ product, cartProducts, onClick }: CartItemProps) => {
 
     const handleDeleteProduct = async (id: string) => {
         try {
+            setProcessing(true)
             await axios.patch("/api/users", {
                 cartProducts: cartProducts.filter((item: Product) => item.id !== id),
                 updatedAt: new Date().toISOString(),
@@ -30,7 +32,8 @@ const CartItem = ({ product, cartProducts, onClick }: CartItemProps) => {
             toast.success("Product removed from cart")
         } catch (error) {
             console.log("ERROR CONNECTING API", error);
-
+        } finally {
+            setProcessing(false)
         }
     }
 

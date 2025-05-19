@@ -6,6 +6,7 @@ import Navbar from "@/components/nav-bar";
 import Footer from "@/components/footer";
 import { ToastProvider } from "@/providers/toast-provider";
 import { CartProvider } from "@/providers/cartProvider";
+import { LoaderProvider } from '@/contacts/loaderContact';
 
 const urbanist = Urbanist({
   variable: "--font-urbanist",
@@ -29,12 +30,11 @@ export default function RootLayout({
           <body
             className={`cn("bg-background antialiased", "${urbanist.variable}") px-10`}
           >
-            {/* <ModelProvider />
-          <ToastProvider />
-          <LoaderProvider /> */}
             <ToastProvider />
             <Navbar />
-            {children}
+            <LoaderProvider >
+              {children}
+            </LoaderProvider>
             <Footer />
           </body>
         </html>
