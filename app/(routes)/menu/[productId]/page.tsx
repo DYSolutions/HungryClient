@@ -95,8 +95,7 @@ const ProductPage = () => {
 
     const handleBuyProduct = () => {
         if (user?.id) {
-            // router.push(`/cart`)
-            toast.success("Product Purchessed")
+            router.push(`/payment`)
         } else {
             router.push(`/sign-in`)
         }
