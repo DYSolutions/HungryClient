@@ -40,7 +40,7 @@ const ProductPage = () => {
                 setAdding(true)
                 let userExists = true;
                 try {
-                    await axios.get("/api/users");
+                    await axios.get("/api/user");
                 } catch (err: any) {
                     if (err.response?.status === 404) {
                         userExists = false;
@@ -48,7 +48,7 @@ const ProductPage = () => {
                 }
 
                 if (!userExists) {
-                    await axios.post('/api/users', {
+                    await axios.post('/api/user', {
                         clerkUserId: user.id,
                         userName: user.fullName,
                         userEmail: user.emailAddresses[0].emailAddress,
@@ -62,12 +62,12 @@ const ProductPage = () => {
                     toast.success("Product added to cart");
                 }
                 else {
-                    const user = await axios.get("/api/users");
+                    const user = await axios.get("/api/user");
                     const alreadyExists = user.data.cartProducts.find((item: Product) => item.id === product.id);
                     if (alreadyExists) {
                         const isChangeServrs = alreadyExists.serves !== serves
                         if (isChangeServrs) {
-                            await axios.patch('/api/users', {
+                            await axios.patch('/api/user', {
                                 cartProducts: user.data.cartProducts.map((item: Product) => item.id === product.id ? { ...item, serves } : item),
                                 updatedAt: new Date().toISOString(),
                             });
@@ -77,7 +77,7 @@ const ProductPage = () => {
                         toast.error("Product already in cart");
                         return;
                     }
-                    await axios.patch('/api/users', {
+                    await axios.patch('/api/user', {
                         cartProducts: [...user.data.cartProducts, product],
                         updatedAt: new Date().toISOString(),
                     });

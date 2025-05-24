@@ -74,8 +74,45 @@ export interface User {
     userEmail: string,
     isAdmin: boolean,
     isActive: boolean,
+    shippingAddress?: Address,
     soldProducts: Product[],
     cartProducts: Product[],
     createdAt: Timestamp | string,
     updatedAt: Timestamp | string
+}
+
+export interface Oreder {
+    id: string,
+    userId: string,
+    // status: "PENDING" | "COMPLETED" | "CANCELLED" | "DELIVERED" | "DELIVERING",
+    status: {
+        name: "PENDING",
+        pending: "bg-yellow-500"
+    } | {
+        name: "COMPLETED",
+        completed: "bg-green-500"
+    } | {
+        name: "CANCELLED",
+        cancelled: "bg-red-500"
+    } | {
+        name: "DELIVERED",
+        delivered: "bg-blue-500"
+    } | {
+        name: "DELIVERING",
+        delivering: "bg-gray-500"
+    },
+    shippingAddress: Address,
+    orderItems: Product[],
+    createdAt: Timestamp | string,
+    updatedAt: Timestamp | string
+}
+
+export interface Address {
+    shippingAddress: string,
+    shippingCity: string,
+    shippingCode: string,
+    shippingCountry: string,
+    shippingPhone: string,
+    shippingName: string,
+    shippingEmail: string,
 }

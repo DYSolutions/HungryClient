@@ -14,7 +14,6 @@ import Processing from "@/components/processing";
 const HomePage = () => {
 
   const { isLoading, setIsLoading } = useLoader();
-  const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [adding, setAdding] = useState(false)
 
@@ -22,7 +21,6 @@ const HomePage = () => {
     try {
       setIsLoading(true)
       const res = await axios.get("/api/products")
-      setProducts(res.data)
       const filteredProducts = res.data.filter((product: Product) => product.isFeatured === true);
       setFeaturedProducts(filteredProducts);
     } catch (error) {

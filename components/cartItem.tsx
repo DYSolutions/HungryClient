@@ -24,7 +24,7 @@ const CartItem = ({ product, cartProducts, onClick, setProcessing }: CartItemPro
     const handleDeleteProduct = async (id: string) => {
         try {
             setProcessing(true)
-            await axios.patch("/api/users", {
+            await axios.patch("/api/user", {
                 cartProducts: cartProducts.filter((item: Product) => item.id !== id),
                 updatedAt: new Date().toISOString(),
             })

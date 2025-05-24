@@ -51,10 +51,14 @@ const CartPage = () => {
 
     const handleBuyProduct = (products: Product[]) => {
         if (user?.id) {
-            router.push(`/payment`)
-            dispatch(
-                setProducts(products)
-            )
+            if (products.length === 0) {
+                toast.error("Please select at least one product")
+            } else {
+                router.push(`/payment`)
+                dispatch(
+                    setProducts(products)
+                )
+            }
         } else {
             router.push(`/sign-in`)
         }
@@ -63,7 +67,7 @@ const CartPage = () => {
     const handleClearCart = async () => {
         try {
             setProcessing(true)
-            await axios.patch("/api/users", {
+            await axios.patch("/api/user", {
                 cartProducts: [],
                 updatedAt: new Date().toISOString(),
             })
@@ -80,7 +84,7 @@ const CartPage = () => {
     async function fetchCartItems() {
         try {
             setIsLoading(true)
-            const user = await axios.get("/api/users");
+            const user = await axios.get("/api/user");
             setCartProducts(user.data.cartProducts);
         } catch (error) {
             console.log("ERROR CONNECTING API", error);
@@ -140,8 +144,7 @@ const CartPage = () => {
                             <button
                                 onClick={() => handleBuyProduct(selectedProducts as Product[])}
                                 className="bg-black text-white cursor-pointer h-10 px-2 w-full mt-4 whitespace-nowrap flex flex-row items-center justify-center gap-2 rounded-lg"
-                                disabled={selectedProducts.length === 0}
-                                >
+                            >
                                 Pay Now</button>
                         </div>
                     </div>

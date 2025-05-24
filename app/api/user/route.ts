@@ -1,7 +1,7 @@
 import { db } from "@/lib/firebase"
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
-import { addDoc, collection, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore"
+import { addDoc, collection, deleteField, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore"
 import { User } from "@/types"
 
 export const GET = async (res: Request) => {
@@ -17,7 +17,7 @@ export const GET = async (res: Request) => {
         })
         const userSnap = users.find((user: User) => user.clerkUserId === userId)
         console.log("userSnap", userSnap);
-        
+
         if (!userSnap) {
             return NextResponse.json({ error: "user not found" }, { status: 404 })
         }
@@ -66,6 +66,17 @@ export const PATCH = async (res: Request) => {
         if (!userSnap) {
             return NextResponse.json({ error: "user not found" }, { status: 404 })
         }
+
+
+        const updateData: any = {
+            updatedAt: data.updatedAt,
+        };
+        if (data.removeShippingAddress) {
+            updateData.shippingAddress = deleteField(); // ✅ delete field
+            await updateDoc(doc(db, "users", userSnap.id), updateData);
+            return NextResponse.json("Address removed successfully");
+        }
+
         await updateDoc(doc(db, "users", userSnap.id), data)
         return NextResponse.json("success")
     } catch (error) {

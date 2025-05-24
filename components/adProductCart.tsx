@@ -28,7 +28,7 @@ const AdProductCart = ({ product, setAdding }: AdProductCartProps) => {
                 setAdding(true)
                 let userExists = true;
                 try {
-                    await axios.get("/api/users"); // will throw 404 if user doesn't exist
+                    await axios.get("/api/user"); // will throw 404 if user doesn't exist
                 } catch (err: any) {
                     if (err.response?.status === 404) {
                         userExists = false;
@@ -36,7 +36,7 @@ const AdProductCart = ({ product, setAdding }: AdProductCartProps) => {
                 }
 
                 if (!userExists) {
-                    await axios.post('/api/users', {
+                    await axios.post('/api/user', {
                         clerkUserId: user.id,
                         userName: user.fullName,
                         userEmail: user.emailAddresses[0].emailAddress,
@@ -50,13 +50,13 @@ const AdProductCart = ({ product, setAdding }: AdProductCartProps) => {
                     toast.success("Product added to cart");
                 }
                 else {
-                    const user = await axios.get("/api/users");
+                    const user = await axios.get("/api/user");
                     const alreadyExists = user.data.cartProducts.some((item: Product) => item.id === product.id);
                     if (alreadyExists) {
                         toast.error("Product already in cart");
                         return;
                     }
-                    await axios.patch('/api/users', {
+                    await axios.patch('/api/user', {
                         cartProducts: [...user.data.cartProducts, product],
                         updatedAt: new Date().toISOString(),
                     });

@@ -17,7 +17,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshCart = async () => {
     try {
-      const user = await axios.get("/api/users");
+      const user = await axios.get("/api/user");
       setCartCount(user.data.cartProducts.length);
     } catch (error) {
       console.error("Failed to fetch cart", error);
