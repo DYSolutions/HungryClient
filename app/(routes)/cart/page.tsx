@@ -13,9 +13,12 @@ import { useLoader } from "@/contacts/loaderContact"
 import Loader from "@/components/loader"
 import { set } from "react-hook-form"
 import Processing from "@/components/processing"
+import { setProducts } from "@/redux/slices/productSlice"
+import { useDispatch } from "react-redux"
 
 const CartPage = () => {
 
+    const dispatch = useDispatch()
     const { isLoading, setIsLoading } = useLoader()
     const { user } = useUser()
     const { cartCount, refreshCart } = useCart()
@@ -46,9 +49,12 @@ const CartPage = () => {
 
     }
 
-    const handleBuyProduct = () => {
+    const handleBuyProduct = (products: Product[]) => {
         if (user?.id) {
             router.push(`/payment`)
+            dispatch(
+                setProducts(products)
+            )
         } else {
             router.push(`/sign-in`)
         }
@@ -85,6 +91,9 @@ const CartPage = () => {
 
     useEffect(() => {
         fetchCartItems();
+        dispatch(
+            setProducts([])
+        )
     }, [cartCount])
 
 
@@ -129,8 +138,10 @@ const CartPage = () => {
                                 <h4 className="text-black font-bold text-[20px]">LKR {total}</h4>
                             </div>
                             <button
-                                onClick={() => handleBuyProduct()}
-                                className="bg-black text-white cursor-pointer h-10 px-2 w-full mt-4 whitespace-nowrap flex flex-row items-center justify-center gap-2 rounded-lg">
+                                onClick={() => handleBuyProduct(selectedProducts as Product[])}
+                                className="bg-black text-white cursor-pointer h-10 px-2 w-full mt-4 whitespace-nowrap flex flex-row items-center justify-center gap-2 rounded-lg"
+                                disabled={selectedProducts.length === 0}
+                                >
                                 Pay Now</button>
                         </div>
                     </div>

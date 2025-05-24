@@ -7,6 +7,7 @@ import Footer from "@/components/footer";
 import { ToastProvider } from "@/providers/toast-provider";
 import { CartProvider } from "@/providers/cartProvider";
 import { LoaderProvider } from '@/contacts/loaderContact';
+import ReduxProvider from "@/redux/storeProvider";
 
 const urbanist = Urbanist({
   variable: "--font-urbanist",
@@ -33,7 +34,9 @@ export default function RootLayout({
             <ToastProvider />
             <Navbar />
             <LoaderProvider >
-              {children}
+              <ReduxProvider>
+                {children}
+              </ReduxProvider>
             </LoaderProvider>
             <Footer />
           </body>

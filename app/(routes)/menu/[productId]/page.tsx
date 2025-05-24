@@ -17,10 +17,13 @@ import { useCart } from "@/providers/cartProvider";
 import Loader from "@/components/loader";
 import { useLoader } from "@/contacts/loaderContact";
 import Processing from "@/components/processing";
+import { useDispatch } from "react-redux";
+import { setProducts } from "@/redux/slices/productSlice";
 
 
 const ProductPage = () => {
 
+    const dispatch = useDispatch()
     const { isLoading, setIsLoading } = useLoader()
     const { refreshCart } = useCart()
     const [serves, setServes] = useState<number>(1)
@@ -28,7 +31,7 @@ const ProductPage = () => {
     const params = useParams()
     const { user } = useUser()
     const [product, setProduct] = useState<Product>();
-    const [products, setProducts] = useState<Product[]>([]);
+    const [allProducts, setAllProducts] = useState<Product[]>([]);
     const [adding, setAdding] = useState(false)
 
     const handleAddCart = async (product: Product) => {
@@ -93,9 +96,12 @@ const ProductPage = () => {
     };
 
 
-    const handleBuyProduct = () => {
+    const handleBuyProduct = (product: Product) => {
         if (user?.id) {
             router.push(`/payment`)
+            dispatch(
+                setProducts([product])
+            )
         } else {
             router.push(`/sign-in`)
         }
@@ -106,7 +112,7 @@ const ProductPage = () => {
             setIsLoading(true)
             const { productId } = await params;
             const res = await axios.get("/api/products");
-            setProducts(res.data);
+            setAllProducts(res.data);
             const filteredProduct = res.data.find((product: Product) => product.id === productId);
             setProduct(filteredProduct)
         } catch (error) {
@@ -119,6 +125,9 @@ const ProductPage = () => {
 
     useEffect(() => {
         fetchProducts()
+        dispatch(
+            setProducts([])
+        )
     }, [])
 
     if (isLoading) return <Loader />
@@ -182,12 +191,12 @@ const ProductPage = () => {
                         </span>
                     </div>
                     <button
-                        onClick={() => handleBuyProduct()}
+                        onClick={() => handleBuyProduct(product as Product)}
                         className="bg-black text-white cursor-pointer h-10 px-2 w-full mt-4 whitespace-nowrap flex flex-row items-center justify-center gap-2 rounded-lg">
                         Pay & Buy Now <FaDollarSign /> {"23.3"}</button>
 
                     <div className="flex flex-col items-center justify-center h-[70%] w-full gap-2">
-                        {products.filter((item: Product) => item.isFeatured && item.category === product?.category).slice(0, 3).map((product: Product) => (
+                        {allProducts.filter((item: Product) => item.isFeatured && item.category === product?.category).slice(0, 3).map((product: Product) => (
                             <AdProductCart key={product.id} product={product} setAdding={setAdding} />
                         ))}
                     </div>
@@ -199,7 +208,7 @@ const ProductPage = () => {
             <div className="w-full">
                 <h4 className="font-bold text-black text-[20px]">Releted Products</h4>
                 <div className="w-full p-4 grid grid-cols-6 gap-4">
-                    {products.filter((item: Product) => item.category === product?.category).map((product: Product) => (
+                    {allProducts.filter((item: Product) => item.category === product?.category).map((product: Product) => (
                         <ProductCart key={product.id} product={product} setAdding={setAdding} />
                     ))}
                 </div>
