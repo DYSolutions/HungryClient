@@ -115,7 +115,7 @@ const Page = () => {
             userId: userData.id,
             status: {
                 name: "PENDING",
-                pending: "bg-yellow-500"
+                color: "bg-yellow-500"
             },
             shippingAddress: userData.shippingAddress,
             orderItems: products,
@@ -128,11 +128,14 @@ const Page = () => {
         try {
             setIsPaymentSuccessModalOpen(true)
             setIsPaymentLoading(true)
-            await axios.patch("/api/user", {
-                soldProducts: [...userData.soldProducts, order],
-                updatedAt: new Date().toString(),
-            })
+            const updatedSoldProducts = userData?.soldProducts
+                ? [...userData.soldProducts, order]
+                : [order];
 
+            await axios.patch("/api/user", {
+                soldProducts: updatedSoldProducts,
+                updatedAt: new Date().toString(),
+            });
             try {
 
                 let cartProducts = userData.cartProducts

@@ -68,13 +68,13 @@ const RemoveAddressModel = ({ setIsRemoveAddressModalOpen, userData }: AddressMo
                     <div className="flex flex-row items-center justify-center gap-2 mt-5">
                         <button
                             onClick={() => setIsRemoveAddressModalOpen(false)}
-                            className="bg-red-400 text-white font-bold text-[15px] p-3 w-[20vh] rounded-md cursor-pointer"
+                            className="bg-red-400 hover:bg-red-500 text-white font-bold text-[15px] p-3 w-[20vh] rounded-md cursor-pointer"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleSubmit}
-                            className="bg-green-400 text-white font-bold text-[15px] w-[20vh] p-3 rounded-md cursor-pointer"
+                            className="bg-green-400 hover:bg-green-500 text-white font-bold text-[15px] w-[20vh] p-3 rounded-md cursor-pointer"
                         >
                             {isUpdating ? "Removing..." : "Remove"}
                         </button>

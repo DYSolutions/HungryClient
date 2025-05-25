@@ -87,19 +87,19 @@ export interface Order {
     // status: "PENDING" | "COMPLETED" | "CANCELLED" | "DELIVERED" | "DELIVERING",
     status: {
         name: "PENDING",
-        pending: "bg-yellow-500"
+        color: "bg-yellow-500"
     } | {
         name: "COMPLETED",
-        completed: "bg-green-500"
+        color: "bg-green-500"
     } | {
-        name: "CANCELLED",
-        cancelled: "bg-red-500"
+        name: "CANCELED",
+        color: "bg-red-500"
     } | {
         name: "DELIVERED",
-        delivered: "bg-blue-500"
+        color: "bg-blue-500"
     } | {
         name: "DELIVERING",
-        delivering: "bg-gray-500"
+        color: "bg-gray-500"
     },
     shippingAddress: Address,
     orderItems: Product[],

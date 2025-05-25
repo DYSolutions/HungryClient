@@ -1,5 +1,4 @@
-import { useCart } from "@/providers/cartProvider"
-import { Address, Product, User } from "@/types"
+import { Address, Order, User } from "@/types"
 import { useUser } from "@clerk/nextjs"
 import axios from "axios"
 import { useRouter } from "next/navigation"
@@ -8,39 +7,43 @@ import { set } from "react-hook-form"
 import toast from "react-hot-toast"
 import { ImCross } from "react-icons/im"
 
-interface ClearCartModelProps {
-    setIsClearCartModalOpen: (value: boolean) => void
-    setSelectedProducts: (value: Product[]) => void
+interface CancelOrderConfirmationModellProps {
+    setIsCancelOrderModalOpen: (value: boolean) => void
+    OrderId: string
+    userData?: User
+    fetchUser: () => void
+    setIsViewOrderModalOpen?: (value: boolean) => void
 }
 
-const ClearCartModel = ({ setIsClearCartModalOpen, setSelectedProducts }: ClearCartModelProps) => {
-
+const CancelOrderConfirmationModel = ({ setIsCancelOrderModalOpen, OrderId, userData, fetchUser, setIsViewOrderModalOpen }: CancelOrderConfirmationModellProps) => {
     const [animate, setAnimate] = useState(false)
+    const { user } = useUser()
+    const router = useRouter()
+
     const [isUpdating, setIsUpdating] = useState(false)
-    const { cartCount, refreshCart } = useCart()
 
     useEffect(() => {
         setAnimate(true)
     }, [])
 
-    const handleClearCart = async () => {
+    const handleCancelOrder = async () => {
         try {
             setIsUpdating(true)
             await axios.patch("/api/user", {
-                cartProducts: [],
+                soldProducts: userData?.soldProducts.map((item: Order) => item.id === OrderId ? { ...item, status: { name: "CANCELED", color: "bg-red-500" } } : item) as Order[],
                 updatedAt: new Date().toISOString(),
             })
-            refreshCart()
-            setSelectedProducts([])
-            toast.success("Cart cleared")
+            toast.success("Order canceled")
         } catch (error) {
             console.log("ERROR CONNECTING API", error);
+            toast.error("Failed to cancel order")
         } finally {
+            if (setIsViewOrderModalOpen) setIsViewOrderModalOpen(false)
+            fetchUser()
             setIsUpdating(false)
         }
-        setIsClearCartModalOpen(false)
+        setIsCancelOrderModalOpen(false)
     }
-
 
     return (
         <div className={`fixed inset-0 z-50 bg-[#0000007c] transition-opacity duration-300 ease-in-out ${animate ? 'opacity-100' : 'opacity-0'}`}>
@@ -50,19 +53,19 @@ const ClearCartModel = ({ setIsClearCartModalOpen, setSelectedProducts }: ClearC
             >
 
                 <div className="w-full  bg-white mt-4 flex flex-col items-center justify-center">
-                    <span>Are you sure you want to clear your cart ?</span>
+                    <span>Are you sure you want to cancel this order ?</span>
                     <div className="flex flex-row items-center justify-center gap-2 mt-5">
                         <button
-                            onClick={() => setIsClearCartModalOpen(false)}
+                            onClick={() => setIsCancelOrderModalOpen(false)}
                             className="bg-red-400 hover:bg-red-500 text-white font-bold text-[15px] p-3 w-[20vh] rounded-md cursor-pointer"
                         >
-                            Cancel
+                            No
                         </button>
                         <button
-                            onClick={handleClearCart}
+                            onClick={handleCancelOrder}
                             className="bg-green-400 hover:bg-green-500 text-white font-bold text-[15px] w-[20vh] p-3 rounded-md cursor-pointer"
                         >
-                            {isUpdating ? "Processing..." : "Clear"}
+                            {isUpdating ? "Canceling..." : "Yes"}
                         </button>
                     </div>
                 </div>
@@ -71,4 +74,4 @@ const ClearCartModel = ({ setIsClearCartModalOpen, setSelectedProducts }: ClearC
     )
 }
 
-export default ClearCartModel
+export default CancelOrderConfirmationModel

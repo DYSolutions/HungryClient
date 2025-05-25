@@ -110,7 +110,7 @@ const AddressModel = ({ setIsAddressModalOpen, userData }: AddressModelProps) =>
                     <h3 className="text-black font-semibold tracking-wide pl-4">Address</h3>
                     <button
                         onClick={() => setIsAddressModalOpen(false)}
-                        className="bg-red-400 text-white font-bold text-[15px] p-3 rounded-md cursor-pointer"
+                        className="bg-red-400 hover:bg-red-500 text-white font-bold text-[15px] p-3 rounded-md cursor-pointer"
                     >
                         <ImCross />
                     </button>
@@ -178,7 +178,7 @@ const AddressModel = ({ setIsAddressModalOpen, userData }: AddressModelProps) =>
                         </div>
                         <div className="w-full flex flex-row items-center justify-center mt-4">
                             <button
-                                type="submit" className="bg-green-500 w-[30vh] text-white font-semibold text-[15px] p-3 rounded-md cursor-pointer">{isUpdating ? "Updating..." : "save"}</button>
+                                type="submit" className="bg-green-400 hover:bg-green-500 w-[30vh] text-white font-semibold text-[15px] p-3 rounded-md cursor-pointer">{isUpdating ? "Updating..." : "save"}</button>
                         </div>
                     </form>
                 </div>
