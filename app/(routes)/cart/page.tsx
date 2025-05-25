@@ -15,6 +15,7 @@ import { set } from "react-hook-form"
 import Processing from "@/components/processing"
 import { setProducts } from "@/redux/slices/productSlice"
 import { useDispatch } from "react-redux"
+import ClearCartModel from "@/components/clearCartModel"
 
 const CartPage = () => {
 
@@ -27,6 +28,7 @@ const CartPage = () => {
     const [cartProducts, setCartProducts] = useState<Product[]>([])
     const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
     const [processing, setProcessing] = useState<boolean>(false)
+    const [isClearCartModalOpen, setIsClearCartModalOpen] = useState<boolean>(false)
 
     useEffect(() => {
         if (!user?.id) {
@@ -64,23 +66,6 @@ const CartPage = () => {
         }
     }
 
-    const handleClearCart = async () => {
-        try {
-            setProcessing(true)
-            await axios.patch("/api/user", {
-                cartProducts: [],
-                updatedAt: new Date().toISOString(),
-            })
-            refreshCart()
-            setSelectedProducts([])
-            toast.success("Cart cleared")
-        } catch (error) {
-            console.log("ERROR CONNECTING API", error);
-        } finally {
-            setProcessing(false)
-        }
-    }
-
     async function fetchCartItems() {
         try {
             setIsLoading(true)
@@ -107,12 +92,13 @@ const CartPage = () => {
 
     return (
         <>
+            {isClearCartModalOpen && <ClearCartModel setIsClearCartModalOpen={setIsClearCartModalOpen} setSelectedProducts={setSelectedProducts} />}
             {processing && <Processing />}
             {isView && (
                 <div className="flex flex-col w-full h-auto p-4 min-h-[600px] mb-10">
                     <div className="w-full h-[50px] flex flex-row items-center justify-between">
                         <h4 className="font-bold text-black text-[20px]">Cart Items {"(" + cartProducts.length + ")"}</h4>
-                        <button onClick={handleClearCart}
+                        <button onClick={() => setIsClearCartModalOpen(true)}
                             className="bg-red-400 whitespace-nowrap cursor-pointer text-white px-2 py-1 rounded-[5px] hover:bg-red-500 transition duration-300 font-semibold text-[15px]">
                             Clear Cart
                         </button>

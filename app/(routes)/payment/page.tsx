@@ -1,6 +1,6 @@
 'use client'
 import { useAppSelector } from "@/redux/hooks";
-import { Product } from "@/types";
+import { Order, Product } from "@/types";
 import React, { useEffect, useState } from "react";
 import { FaProductHunt, FaShoppingCart } from "react-icons/fa";
 import AddressModel from "@/components/addressModel";
@@ -17,6 +17,8 @@ import axios from "axios";
 import { User } from "@/types"
 import toast from "react-hot-toast";
 import RemoveAddressModel from "@/components/removeAddressModel";
+import { useCart } from "@/providers/cartProvider";
+import PaymentSuccessModel from "@/components/paymentSucsessModel";
 
 
 type CardForm = {
@@ -29,8 +31,10 @@ type CardForm = {
 const Page = () => {
 
     // const { user } = useUser();
-    // const router = useRouter();
+    const router = useRouter();
     const { isLoading, setIsLoading } = useLoader()
+    const { cartCount, refreshCart } = useCart()
+    const [isPaymentLoading, setIsPaymentLoading] = useState(false)
     const products: Product[] = useAppSelector((state) => state.productSlice.products);
 
     // useEffect(() => {
@@ -51,7 +55,9 @@ const Page = () => {
     const [errors, setErrors] = useState<Partial<CardForm>>({});
     const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
     const [isRemoveAddressModalOpen, setIsRemoveAddressModalOpen] = useState(false);
+    const [isPaymentSuccessModalOpen, setIsPaymentSuccessModalOpen] = useState(false);
     const [userData, setUserData] = useState<User>();
+    const [cartProducts, setCartProducts] = useState<Product[]>([])
 
     const validate = () => {
         const errs: Partial<CardForm> = {};
@@ -63,16 +69,6 @@ const Page = () => {
         return Object.keys(errs).length === 0;
     };
 
-    const handlePay = () => {
-        if (!userData?.shippingAddress) {
-            toast.error("Please add shipping address")
-            return
-        }
-
-        if (!validate()) return;
-
-
-    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -101,6 +97,74 @@ const Page = () => {
 
     const total = products.reduce((acc, product) => acc + Number(product.price) * Number(product.serves || 1), 0);
 
+    const handlePay = async () => {
+        if (!userData?.shippingAddress) {
+            toast.error("Please add shipping address")
+            return
+        }
+
+        if (products.length === 0) {
+            toast.error("Please add products to cart")
+            return
+        }
+
+        if (!validate()) return;
+
+        const order: Order = {
+            id: crypto.randomUUID(),
+            userId: userData.id,
+            status: {
+                name: "PENDING",
+                pending: "bg-yellow-500"
+            },
+            shippingAddress: userData.shippingAddress,
+            orderItems: products,
+            totalPrice: total,
+            paymentMethod: "cart",
+            createdAt: new Date().toString(),
+            updatedAt: new Date().toString(),
+        }
+
+        try {
+            setIsPaymentSuccessModalOpen(true)
+            setIsPaymentLoading(true)
+            await axios.patch("/api/user", {
+                soldProducts: [...userData.soldProducts, order],
+                updatedAt: new Date().toString(),
+            })
+
+            try {
+
+                let cartProducts = userData.cartProducts
+                {
+                    products.map(async (product: Product) => {
+                        cartProducts = cartProducts.filter((item: Product) => item.id !== product.id)
+                    })
+                    await axios.patch("/api/user", {
+                        cartProducts: cartProducts,
+                        updatedAt: new Date().toISOString(),
+                    })
+                }
+
+                refreshCart()
+            } catch (error) {
+                console.log("ERROR CONNECTING CART API", error);
+                setIsPaymentLoading(false)
+                setIsPaymentSuccessModalOpen(false)
+            }
+
+            toast.success("Payment successful");
+        } catch (error) {
+            console.log("ERROR CONNECTING PAYMENT API", error);
+            toast.error("Payment failed")
+            setIsPaymentLoading(false)
+            setIsPaymentSuccessModalOpen(false)
+        } finally {
+            setIsPaymentLoading(false)
+        }
+    };
+
+
     if (isLoading) return <Loader />
 
     return (
@@ -109,6 +173,12 @@ const Page = () => {
                 <AddressModel
                     setIsAddressModalOpen={setIsAddressModalOpen}
                     userData={userData}
+                />
+            }
+
+            {isPaymentSuccessModalOpen &&
+                <PaymentSuccessModel
+                    isPaymentloading={isPaymentLoading}
                 />
             }
 
@@ -269,7 +339,7 @@ const Page = () => {
 
                         <button
                             onClick={handlePay}
-                            className="w-full flex justify-center items-center gap-2 bg-green-600 text-white py-2 rounded hover:bg-green-700"
+                            className="w-full cursor-pointer flex justify-center items-center gap-2 bg-green-600 text-white py-2 rounded hover:bg-green-700"
                         >
                             <FaShoppingCart className="text-white" />
                             Pay Now {total} LKR

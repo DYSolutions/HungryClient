@@ -75,13 +75,13 @@ export interface User {
     isAdmin: boolean,
     isActive: boolean,
     shippingAddress?: Address,
-    soldProducts: Product[],
+    soldProducts: Order[],
     cartProducts: Product[],
     createdAt: Timestamp | string,
     updatedAt: Timestamp | string
 }
 
-export interface Oreder {
+export interface Order {
     id: string,
     userId: string,
     // status: "PENDING" | "COMPLETED" | "CANCELLED" | "DELIVERED" | "DELIVERING",
@@ -103,6 +103,8 @@ export interface Oreder {
     },
     shippingAddress: Address,
     orderItems: Product[],
+    totalPrice: number,
+    paymentMethod: string,
     createdAt: Timestamp | string,
     updatedAt: Timestamp | string
 }
