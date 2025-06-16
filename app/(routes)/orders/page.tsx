@@ -13,16 +13,16 @@ const OrdersPage = () => {
 
     const [isViewOrderModalOpen, setIsViewOrderModalOpen] = useState<boolean>(false);
     const [isCancelOrderModalOpen, setIsCancelOrderModalOpen] = useState<boolean>(false);
-    const [userData, setUserData] = useState<User>();
+    const [ordersData, setOrdersData] = useState<Order[]>();
     const { setIsLoading, isLoading } = useLoader();
     const [selectedOrder, setSelectedOrder] = useState<Order>();
     const [cancelOrderId, setCancelOrderId] = useState<string>("");
 
-    async function fetchUser() {
+    async function fetchOrders() {
         try {
             setIsLoading(true)
-            const res = await axios.get("/api/user")
-            setUserData(res.data);
+            const res = await axios.get("/api/orders")
+            setOrdersData(res.data);
         } catch (error) {
             console.log("ERROR CONNECTING API", error);
         } finally {
@@ -31,16 +31,16 @@ const OrdersPage = () => {
     }
 
     useEffect(() => {
-        fetchUser();
+        fetchOrders();
     }, []);
 
 
     return isLoading ? <Loader /> : (
         <div className="flex flex-col w-full h-auto p-4 min-h-[600px] mb-10">
-            {isViewOrderModalOpen && <ViewOrderModel setIsViewOrderModalOpen={setIsViewOrderModalOpen} Order={selectedOrder} userData={userData} fetchUser={fetchUser} />}
-            {isCancelOrderModalOpen && <CancelOrderConfirmationModel setIsCancelOrderModalOpen={setIsCancelOrderModalOpen} OrderId={cancelOrderId} userData={userData} fetchUser={fetchUser} />}
+            {isViewOrderModalOpen && <ViewOrderModel setIsViewOrderModalOpen={setIsViewOrderModalOpen} Order={selectedOrder} orderData={ordersData} fetchUser={fetchOrders} />}
+            {isCancelOrderModalOpen && <CancelOrderConfirmationModel setIsCancelOrderModalOpen={setIsCancelOrderModalOpen} OrderId={cancelOrderId} orderData={ordersData} fetchUser={fetchOrders} />}
             <div className="w-full h-[50px] flex flex-row items-center justify-between">
-                <h4 className="font-bold text-black text-[20px]">My Orders {"(" + (userData?.soldProducts?.length || "0") + ")"}</h4>
+                <h4 className="font-bold text-black text-[20px]">My Orders {"(" + (ordersData?.length || "0") + ")"}</h4>
             </div>
 
             <div className="w-full h-full flex flex-col items-start justify-start gap-2">
@@ -65,9 +65,9 @@ const OrdersPage = () => {
                     </div>
                 </div>
 
-{userData?.soldProducts?
+{ordersData?
 (<>
-                {userData?.soldProducts
+                {ordersData
                     ?.slice()
                     .sort((a: Order, b: Order) => {
                         const dateA = a.createdAt instanceof Timestamp ? a.createdAt.toDate() : new Date(a.createdAt);
@@ -95,7 +95,7 @@ const OrdersPage = () => {
                                 <div className="w-auto bg-white flex flex-col gap-4">
 
                                     {order?.status.name === "PENDING" ? (
-                                        <button onClick={() => { { setCancelOrderId(order.id), setIsCancelOrderModalOpen(true) } }} className="bg-red-400 hover:bg-red-500 text-white font-bold text-[10px] p-2 rounded-md cursor-pointer">
+                                        <button onClick={() => { { setCancelOrderId(order.id as string), setIsCancelOrderModalOpen(true) } }} className="bg-red-400 hover:bg-red-500 text-white font-bold text-[10px] p-2 rounded-md cursor-pointer">
                                             Cancel Order
                                         </button>
                                     ) : (

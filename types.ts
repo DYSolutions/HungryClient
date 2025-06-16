@@ -75,14 +75,14 @@ export interface User {
     isAdmin: boolean,
     isActive: boolean,
     shippingAddress?: Address,
-    soldProducts: Order[],
     cartProducts: Product[],
     createdAt: Timestamp | string,
     updatedAt: Timestamp | string
 }
 
 export interface Order {
-    id: string,
+    id?: string,
+    key?: string,
     userId: string,
     // status: "PENDING" | "COMPLETED" | "CANCELLED" | "DELIVERED" | "DELIVERING",
     status: {

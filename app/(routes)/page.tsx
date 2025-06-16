@@ -42,7 +42,7 @@ const HomePage = () => {
 
       {adding && <Processing />}
       <div className="w-full h-auto flex flex-row justify-between">
-        <div className="text-center w-full flex flex-col justify-center items-center bg-green-400 rounded-2xl shadow-lg p-10">
+        <div className="text-center w-full flex flex-col justify-center items-center bg-[url('/hover.png')] bg-cover bg-center rounded-2xl shadow-lg p-10">
           <h1 className="text-4xl font-bold text-center text-white mb-4">
             JUST COME TO HUNGRY <br />& ORDER
           </h1>

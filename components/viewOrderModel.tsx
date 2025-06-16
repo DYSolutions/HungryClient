@@ -11,11 +11,11 @@ import CancelOrderConfirmationModel from "./cancelOrderConfirmationModel"
 interface ViewOrderModelProps {
     setIsViewOrderModalOpen: (value: boolean) => void
     Order?: Order
-    userData?: User
+    orderData?: Order[]
     fetchUser: () => void
 }
 
-const ViewOrderModel = ({ setIsViewOrderModalOpen, Order, userData ,fetchUser}: ViewOrderModelProps) => {
+const ViewOrderModel = ({ setIsViewOrderModalOpen, Order, orderData ,fetchUser}: ViewOrderModelProps) => {
     const [animate, setAnimate] = useState(false)
     const { user } = useUser()
     const router = useRouter()
@@ -103,8 +103,8 @@ const ViewOrderModel = ({ setIsViewOrderModalOpen, Order, userData ,fetchUser}: 
                     )}
                 </div>
             </div>
-            {isCancelOrderModalOpen && Order?.id && userData && (
-                <CancelOrderConfirmationModel setIsCancelOrderModalOpen={setIsCancelOrderModalOpen} OrderId={Order.id} userData={userData} fetchUser={fetchUser} setIsViewOrderModalOpen={setIsViewOrderModalOpen} />
+            {isCancelOrderModalOpen && Order?.id && orderData && (
+                <CancelOrderConfirmationModel setIsCancelOrderModalOpen={setIsCancelOrderModalOpen} OrderId={Order.id} orderData={orderData} fetchUser={fetchUser} setIsViewOrderModalOpen={setIsViewOrderModalOpen} />
             )}
         </div>
     )
